@@ -1,6 +1,7 @@
 import React, {ChangeEvent, useState} from 'react';
 import './App.css';
 import Button from "./Button";
+import Tablo from "./Tablo";
 
 function App() {
     // Пока вводим сообщение должны быть задизейблены кнопки INC и Reset и сообщение нажать кнопку Set
@@ -8,44 +9,75 @@ function App() {
     //подсветка инпутов во время ошибки
     // После нажатия Set она дизейблится до начала ввода нового значение
 
-    let [count, setCount] = useState("enter values and press 'set'") // Результат щетчика
-    let [error, setError] = useState<boolean>(true)
+    let [count, setCount] = useState() // Результат щетчика
+    let [error, setError] = useState<boolean>(false)
+
+    let [disableBtn, setDisableBtn] = useState<boolean>(false) // Дизайбл кнопки SET
+    let [incError, setIncError] = useState<boolean>(true) // Дизайбл кнопки INC
+    let [resetError, setResetError] = useState<boolean>(true) // Дизайбл кнопки RESET
     let [errorMessage, setErrorMessage] = useState<string>('')
 
-    let [maxValue, setMaxValue] = useState()
-    let [startValue, setStartValue] = useState()
+    let [maxValue, setMaxValue] = useState(5)
+    let [startValue, setStartValue] = useState(0)
 
     const incValue = () => {
         if (startValue < maxValue) {
-            setCount(count + 1)
+            setCount(++count)
+        }
+        if (maxValue === count) {
+            setIncError(true)
         }
     }
 
     const changeStartValue = (e: ChangeEvent<HTMLInputElement>) => {
         let start = Number(e.currentTarget.value)
-        if (start >= maxValue) {
+        if (start >= maxValue || start < 0) {
             setError(true)
+            setIncError(true) // disable INC
+            setDisableBtn(true) // disable SET
+            setResetError(true) // disable RESET
             setErrorMessage('Incorrect value')
         } else {
             setError(false)
+            setIncError(false)
+            setDisableBtn(false)
+            setResetError(false)
+            setCount("enter values and press 'set'")
         }
         setStartValue(start) // Делаю number для инпута старт
     }
 
     const changeMaxValue = (e: ChangeEvent<HTMLInputElement>) => {
         let max = Number(e.currentTarget.value)
-        if (max <= startValue) {
+        if (max <= startValue || startValue < 0) {
             setError(true)
+            setIncError(true)
+            setDisableBtn(true)
+            setResetError(true)
             setErrorMessage('Incorrect value')
-        }
-         else {
+        } else {
             setError(false)
+            setIncError(false)
+            setDisableBtn(false)
+            setResetError(false)
+            setCount("enter values and press 'set'")
         }
         setMaxValue(max)
     }
 
     const resetValue = () => {
+        setDisableBtn(true)
+        setIncError(false)
+        setResetError(false)
         setCount(startValue)
+    }
+
+
+    const setIncErrorF = () => {
+
+    }
+    const setResetErrorF = () => {
+
     }
 
     return (
@@ -62,21 +94,25 @@ function App() {
                        value={maxValue}
                        onChange={changeMaxValue}
                 />
-                <button onClick={resetValue}
-                        disabled={error}>SET
-                </button>
+                <Button
+                    funcOnClick={resetValue}
+                    disableAction={disableBtn}
+                    name={'SET'}
+                />
             </div>
             <div>
-                {error ? <h2>{errorMessage}</h2> : <h2>{count}</h2>}
-                <button
-                    onClick={incValue}
-                    disabled={count >= maxValue}
-                >inc
-                </button>
-                <button disabled={error}
-                        onClick={resetValue}
-                >RESET
-                </button>
+                <Tablo
+                    incValue={incValue}
+                    resetValue={resetValue}
+                    count={count}
+                    maxValue={maxValue}
+                    error={error}
+                    errorMessage={errorMessage}
+                    incError={incError}
+                    setIncError={setIncErrorF}
+                    resetError={resetError}
+                    setResetError={setResetErrorF}
+                />
             </div>
         </div>
     );

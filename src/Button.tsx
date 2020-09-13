@@ -2,12 +2,16 @@ import React from 'react'
 
 type ButtonType = {
     name: string
+    funcOnClick?: () => void
+    disableAction: boolean
 }
 
 const Button = (props: ButtonType) => {
     return (
         <>
-            <button>{props.name}</button>
+            <button
+                disabled={props.disableAction}
+                onClick={props.funcOnClick}>{props.name}</button>
         </>
     )
 }
