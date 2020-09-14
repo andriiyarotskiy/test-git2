@@ -16,21 +16,28 @@ export type TabloType = {
 const Tablo = (props: TabloType) => {
 
     return (
-        <div>
+        <div className='tablo'>
             {props.error
-                ? <h2>{props.errorMessage}</h2>
+                ? <h2 style={{color: 'red'}}>{props.errorMessage}</h2>
                 : props.message
                     ? <h2>{props.enterValueMessage}</h2>
-                    : <h2>{props.count}</h2>}
-            <Button
-                funcOnClick={props.incValue}
-                // disableAction={props.error || props.count >= props.maxValue}
-                disableAction={props.incError}
-                name={'INC'}/>
-            <Button
-                funcOnClick={props.resetValue}
-                disableAction={props.resetError}
-                name={'RESET'}/>
+                    : <h2 className={props.incError ? 'redCount': 'blueCount'}>{props.count}</h2>}
+            <div className='buttomWrap'>
+                <div className='tablo__btn incBtn'>
+                    <Button
+                        funcOnClick={props.incValue}
+                        disableAction={props.incError}
+                        name={'INC'}/>
+                </div>
+                <div className='tablo__btn resBtn'>
+                    <Button
+                        funcOnClick={props.resetValue}
+                        disableAction={props.resetError}
+                        name={'RESET'}/>
+                </div>
+
+
+            </div>
         </div>
     )
 }

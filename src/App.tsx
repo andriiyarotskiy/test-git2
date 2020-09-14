@@ -71,7 +71,7 @@ function App() {
             setMessage(false)
         } else {
             setMessage(true)
-            setEnterValueMessage("enter values and press 'set'")
+            setEnterValueMessage("Enter values and press 'SET'")
             setError(false)
             setIncError(false)
             setDisSetBtn(false)
@@ -91,25 +91,39 @@ function App() {
 
     return (
         <div className="App">
-            <div>
+            <div className='Container'>
                 <h1>Counter</h1>
-                <span>start</span>
-                <input type="number"
-                       value={startValue}
-                       onChange={changeStartValue}
-                />
-                <span>max</span>
-                <input type="number"
-                       value={maxValue}
-                       onChange={changeMaxValue}
-                />
-                <Button
-                    funcOnClick={resetValue}
-                    disableAction={disSetBtn}
-                    name={'SET'}
-                />
-            </div>
-            <div>
+                <div className="inputContainer">
+                    <div className='input_minValue'>
+                        <h2>Min</h2>
+                        <input
+                            className='input'
+                            type="text"
+                            inputMode="numeric"
+                            pattern="[-+]?[0-9]*[.,]?[0-9]+"
+                            value={startValue}
+                            onChange={changeStartValue}
+                        />
+                    </div>
+                    <div className='input_maxValue'>
+                        <h2>Max</h2>
+                        <input
+                            className='input'
+                            type="text"
+                            inputMode="numeric"
+                            pattern="[-+]?[0-9]*[.,]?[0-9]+"
+                            value={maxValue}
+                            onChange={changeMaxValue}
+                        />
+                    </div>
+                </div>
+                <div className='setBtnContainer'>
+                    <Button
+                        funcOnClick={resetValue}
+                        disableAction={disSetBtn}
+                        name={'SET'}
+                    />
+                </div>
                 <Tablo
                     incValue={incValue}
                     resetValue={resetValue}
@@ -127,3 +141,4 @@ function App() {
 }
 
 export default App;
+
