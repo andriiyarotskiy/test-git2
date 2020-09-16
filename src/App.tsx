@@ -4,7 +4,14 @@ import Button from "./Button";
 import Tablo from "./Tablo";
 import {useDispatch, useSelector} from "react-redux";
 import {AppRootStateType} from "./state/store";
-import {incrementAC, setMinValueAC} from "./state/countReducer";
+import {
+    incrementAC,
+    setMinValueAC,
+    disableType,
+    buttonLockAC,
+    setMessageAC,
+    ERROR_MESSAGE, PLEASE_ENTER_VALUE_MESSAGE, setErrorAC
+} from "./state/countReducer";
 
 function App() {
     // Пока вводим сообщение должны быть задизейблены кнопки INC и Reset и сообщение нажать кнопку Set
@@ -13,16 +20,11 @@ function App() {
     // После нажатия Set она дизейблится до начала ввода нового значение
 
     const count = useSelector<AppRootStateType, number>(state => state.count.countValue)
+    const disableBtn = useSelector<AppRootStateType, disableType>(state => state.count.disable)
+    const error = useSelector<AppRootStateType, boolean>(state => state.count.error)
+    const message = useSelector<AppRootStateType, boolean>(state => state.count.messageToggle)
+
     const dispatch = useDispatch()
-
-    let [disSetBtn, setDisSetBtn] = useState<boolean>(true) // Дизайбл кнопки SET
-    let [disIncBtn, setIncError] = useState<boolean>(true) // Дизайбл кнопки INC
-    let [disResBtn, setDisResBtn] = useState<boolean>(true) // Дизайбл кнопки RESET
-
-    let [error, setError] = useState<boolean>(false)
-    let [errorMessage, setErrorMessage] = useState<string>('') // Error Message
-    let [message, setMessage] = useState<boolean>(false)
-    let [enterValueMessage, setEnterValueMessage] = useState<string>('')
 
     let [maxValue, setMaxValue] = useState(0) // inputMax handler
     let [startValue, setStartValue] = useState(0) // inputMin handler
@@ -33,59 +35,45 @@ function App() {
             dispatch(incrementAC())
         }
         if ((maxValue - 1) === count) {
-            setIncError(true)
+            dispatch(buttonLockAC(true, true, false))
         }
     }
 
     const changeStartValue = (e: ChangeEvent<HTMLInputElement>) => {
-        let start = Number(e.currentTarget.value)
-        if (start >= maxValue || start < 0) {
-            setError(true)
-            setErrorMessage('Incorrect value')
-
-            setIncError(true) // disable INC
-            setDisSetBtn(true) // disable SET
-            setDisResBtn(true) // disable RESET
-            setMessage(false)
-        } else {
-            setMessage(true)
-            setEnterValueMessage("enter values and press 'set'")
-
-            setIncError(false)
-            setDisSetBtn(false)
-            setDisResBtn(false)
-
-            setError(false)
+        if (!isNaN(Number(e.currentTarget.value))) { // check оn isNan
+            let start = +(e.currentTarget.value)
+            setStartValue(start)
+            if (start >= maxValue || start < 0) {
+                dispatch(setErrorAC(true))
+                dispatch(buttonLockAC(true, true, true))
+                dispatch(setMessageAC(false))
+            } else {
+                dispatch(setMessageAC(true))
+                dispatch(buttonLockAC(false, false, false))
+                dispatch(setErrorAC(false))
+            }
         }
-        setStartValue(start)
     }
 
     const changeMaxValue = (e: ChangeEvent<HTMLInputElement>) => {
-        let max = Number(e.currentTarget.value)
-        if (max <= startValue || startValue < 0) {
-            setError(true)
-            setIncError(true)
-            setDisSetBtn(true)
-            setDisResBtn(true)
-            setErrorMessage('Incorrect value')
-            setMessage(false)
-        } else {
-            setMessage(true)
-            setEnterValueMessage("Enter values and press 'SET'")
-            setError(false)
-            setIncError(false)
-            setDisSetBtn(false)
-            setDisResBtn(false)
+        if (!isNaN(Number(e.currentTarget.value))) { // check оn isNan
+            let max = +(e.currentTarget.value)
+            setMaxValue(max)
+            if (max <= startValue || startValue < 0) {
+                dispatch(setErrorAC(true))
+                dispatch(buttonLockAC(true, true, true))
+                dispatch(setMessageAC(false))
+            } else {
+                dispatch(setMessageAC(true))
+                dispatch(setErrorAC(false))
+                dispatch(buttonLockAC(false, false, false))
+            }
         }
-        setMaxValue(max)
     }
 
     const resetValue = () => {
-        setDisSetBtn(true)
-
-        setMessage(false)
-        setIncError(false)
-        setDisResBtn(false)
+        dispatch(buttonLockAC(false, true, false))
+        dispatch(setMessageAC(false))
         dispatch(setMinValueAC(startValue))
     }
 
@@ -120,7 +108,7 @@ function App() {
                 <div className='setBtnContainer'>
                     <Button
                         funcOnClick={resetValue}
-                        disableAction={disSetBtn}
+                        disableAction={disableBtn.disSetBtn}
                         name={'SET'}
                     />
                 </div>
@@ -129,11 +117,11 @@ function App() {
                     resetValue={resetValue}
                     count={count}
                     error={error}
-                    errorMessage={errorMessage}
+                    errorMessage={ERROR_MESSAGE}
                     message={message}
-                    enterValueMessage={enterValueMessage}
-                    incError={disIncBtn}
-                    resetError={disResBtn}
+                    enterValueMessage={PLEASE_ENTER_VALUE_MESSAGE}
+                    incError={disableBtn.disIncBtn}
+                    resetError={disableBtn.disResBtn}
                 />
             </div>
         </div>
